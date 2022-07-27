@@ -1,4 +1,10 @@
-import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
+import {
+	doc,
+	DocumentReference,
+	getDoc,
+	getFirestore,
+	setDoc,
+} from 'firebase/firestore';
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, User } from 'firebase/auth';
@@ -29,32 +35,29 @@ export const auth = getAuth(app);
 export const firestore = getFirestore(app);
 export const googleAuthProvider = new GoogleAuthProvider();
 
-export const createUserProfileDocument = async (
-	userAuth: User,
-	additionalData: any
-) => {
-	if (!userAuth) return;
+export const getSnapshotFromUserAuth = async (userAuth: User) => {
+	const userRef: DocumentReference = doc(firestore, `users/${userAuth.uid}`);
+	return await getDoc(userRef);
+};
 
-	const userRef = doc(firestore, `users/${userAuth.uid}`);
-	const snapShot = await getDoc(userRef);
+// argument displayName is used only when signUp with email
+export const createUserProfileDocument = async (userAuth: User, username?: string) => {
+	const snapShot = await getSnapshotFromUserAuth(userAuth);
 
 	if (!snapShot.exists()) {
 		const { displayName, email, photoURL } = userAuth;
 		const createdAt = new Date();
 		try {
-			await setDoc(userRef, {
-				displayName,
+			await setDoc(doc(firestore, `users/${userAuth.uid}`), {
+				displayName: displayName ?? username,
 				email,
 				photoURL,
 				createdAt,
-				...additionalData,
 			});
 		} catch (error) {
 			console.log('error creating user', (error as Error).message);
 		}
 	}
-
-	return userRef;
 };
 
 export const getCurrentUser = () => {
