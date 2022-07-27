@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
+import { AuthData } from '../../pages/Auth/Auth';
 
 export interface AuthState {
 	loading: boolean;
@@ -36,10 +37,13 @@ export const authSlice = createSlice({
 		checkIsLoggedIn: (state) => {
 			state.loading = true;
 		},
-		emailSignInstart: (state) => {
+		emailSignInstart: (state, action: PayloadAction<AuthData>) => {
 			state.loading = true;
 		},
 		googlSignInstart: (state) => {
+			state.loading = true;
+		},
+		signOutStart: (state) => {
 			state.loading = true;
 		},
 		signInSuccess: (state, action: PayloadAction<any>) => {

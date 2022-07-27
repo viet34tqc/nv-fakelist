@@ -1,7 +1,7 @@
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, User } from 'firebase/auth';
 
 const {
 	REACT_APP_FIREBASE_API_KEY,
@@ -30,7 +30,7 @@ export const firestore = getFirestore(app);
 export const googleAuthProvider = new GoogleAuthProvider();
 
 export const createUserProfileDocument = async (
-	userAuth: any,
+	userAuth: User,
 	additionalData: any
 ) => {
 	if (!userAuth) return;
@@ -50,7 +50,7 @@ export const createUserProfileDocument = async (
 				...additionalData,
 			});
 		} catch (error) {
-			console.log('error creating user', error.message);
+			console.log('error creating user', (error as Error).message);
 		}
 	}
 
