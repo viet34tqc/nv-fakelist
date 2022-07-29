@@ -1,25 +1,21 @@
-import { all, call, takeLatest } from 'redux-saga/effects';
+import { all, call, put, takeLatest } from 'redux-saga/effects';
+import moviesApi from './moviesApi';
 import { moviesSlicesAction } from './moviesSlice';
-import { request } from './request';
 
 function* fetchActionMovies(): any {
 	// Get data from API
 	// If success, dispatch action fetchSuccess
 	// Else, dispatch action fetch faile
-	const data: any = yield call(
-		fetch(request.fetchActionMovies)
-			.then((res) => {
-				const actionMovies = res.data.results.map((el) => ({
-					...el,
-					isFavourite: false,
-				}));
-				dispatch(moviesSlicesAction.actionMoviesSuccess(actionMovies));
-			})
-			.catch((error) => {
-				const errorMessage = error.message;
-				dispatch(moviesSlicesAction.actionMoviesError(errorMessage));
-			})
-	);
+	try {
+		const data = yield call(moviesApi.getActionMovies);
+		const actionMovies = data.data.results.map((el: any) => ({
+			...el,
+			isFavourite: false,
+		}));
+		yield put(moviesSlicesAction.actionMoviesSuccess(actionMovies));
+	} catch (error) {
+		yield put(moviesSlicesAction.actionMoviesError((error as Error).message));
+	}
 }
 
 function* onFetchActionMovies() {
